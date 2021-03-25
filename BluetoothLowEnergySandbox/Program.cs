@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -6,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using BluetoothLowEnergySandbox.Blackmagic;
 
 namespace BluetoothLowEnergySandbox
 {
@@ -47,20 +49,46 @@ namespace BluetoothLowEnergySandbox
                         if (token.IsCancellationRequested) break;
 
                         gamepad.Update();
-                        var diff = gamepad.LStick_N.X;
-                        await character.SendFocusOrder(diff * 0.02f);
-                        Console.WriteLine(diff);
+                        try
+                        {
+                            var messageQueue = new Queue<CameraControlProtocolMessage>();
+                            // focus
+                            var diff = gamepad.LStick_N.X;
+                            if (Math.Abs(diff) > 0.01f)
+                            {
+                                messageQueue.Enqueue(CameraControlProtocolMessage.ManualLensFocusRelative(
+                                    DestinationDeviceType.One,
+                                    diff * 0.02f));
+                            }
+                            if (gamepad.LStick_down)
+                            {
+                                messageQueue.Enqueue(CameraControlProtocolMessage.AutoFocus(DestinationDeviceType.One));
+                            }
 
-                        // Console.WriteLine("waiting...");
-                        // var keyInfo = Console.ReadKey();
-                        // if (keyInfo.Key == ConsoleKey.J)
-                        // {
-                        //     await character.SendFocusOrder(-0.01f);
-                        // }
-                        // else if (keyInfo.Key == ConsoleKey.K)
-                        // {
-                        //     await character.SendFocusOrder(+0.01f);
-                        // }
+                            if (gamepad.Back_down)
+                            {
+                                messageQueue.Enqueue(CameraControlProtocolMessage.StartRecording(DestinationDeviceType.One));
+                            }
+
+                            while (messageQueue.Count > 0)
+                            {
+                                var message = messageQueue.Dequeue();
+                                Console.WriteLine($"Sending... {message}");
+                                var result = await character.WriteValueAsync(message.Message.AsBuffer());
+                                if (result != GattCommunicationStatus.Success)
+                                {
+                                    Console.WriteLine($"Send Error: {result}");
+                                }
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Catch Exception: {e}");
+                        }
                     }
                 }
                 
@@ -70,58 +98,6 @@ namespace BluetoothLowEnergySandbox
             {
                 Console.WriteLine($"Catch Exception: {e}");
             }
-        }
-
-        private static async Task SendFocusOrder(this GattCharacteristic character, double diff)
-        {
-            var value = diff.GetBlackmagicSignedFixedPoint16();
-            var focusOrder = new byte[]
-            {
-                0x01, // destination
-                0x06, // length
-                0x00, 0x00, // reserved
-                0x00, 0x00, // category & parameter
-                0x80, // type
-                0x01, // operation 相対制御
-                // 0x33, 0x01,
-                value[0], value[1],
-                0x00, 0x00,
-            };
-            
-            var autoFocusOrder = new byte[]
-            {
-                0xFF, // destination
-                0x04, // length
-                0x00, 0x00, // reserved
-                0x00, 0x01, // category & parameter
-                0x00, // type
-                0x00, // operation
-            };
-            
-            var recordingOrder = new byte[]
-            {
-                0xFF, // destination
-                0x08, // length
-                0x00, 0x00, // reserved
-                0x0a, 0x01, // category & parameter
-                0x01, // type
-                0x00, // operation
-                0x02, 0x00, 0x00, 0x01,
-            };
-            
-            Console.WriteLine($"Send Focus: {diff} : {focusOrder[8]}, {focusOrder[9]}");
-
-            var result = await character.WriteValueAsync(focusOrder.AsBuffer());
-            if (result != GattCommunicationStatus.Success)
-            {
-                Console.WriteLine($"Send Error: {result}");
-            }
-        }
-
-        private static byte[] GetBlackmagicSignedFixedPoint16(this double val)
-        {
-            var x = (ushort) Math.Floor(val * Math.Pow(2, 11));
-            return BitConverter.GetBytes(x);
         }
     }
 }

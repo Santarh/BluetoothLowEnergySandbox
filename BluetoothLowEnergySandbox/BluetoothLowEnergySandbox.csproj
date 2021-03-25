@@ -39,6 +39,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Blackmagic\BlackmagicExtensions.cs" />
+        <Compile Include="Blackmagic\CameraControlProtocolMessage.cs" />
+        <Compile Include="Blackmagic\Command.cs" />
+        <Compile Include="Blackmagic\CommandDataType.cs" />
+        <Compile Include="Blackmagic\DestinationDeviceType.cs" />
+        <Compile Include="Blackmagic\CommandOperationType.cs" />
         <Compile Include="BleAdvertisementFinder.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
