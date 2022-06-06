@@ -40,6 +40,11 @@ namespace BlackmagicCameraControlProtocol
             Message = message;
         }
 
+        public CameraControlProtocolMessage(byte[] data)
+        {
+            Message = data;
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder("0x ");
