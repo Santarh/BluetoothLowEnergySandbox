@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using BluetoothLowEnergySandbox.Blackmagic;
+using BlackmagicCameraControl.Blackmagic;
 
-namespace BluetoothLowEnergySandbox
+namespace BlackmagicCameraControl
 {
     internal static class Program
     {

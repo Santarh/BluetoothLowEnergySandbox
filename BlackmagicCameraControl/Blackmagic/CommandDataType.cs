@@ -1,4 +1,4 @@
-﻿namespace BluetoothLowEnergySandbox.Blackmagic
+﻿namespace BlackmagicCameraControl.Blackmagic
 {
     public enum CommandDataType : byte
     {

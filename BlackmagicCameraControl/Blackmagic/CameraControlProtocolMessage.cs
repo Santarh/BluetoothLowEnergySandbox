@@ -3,7 +3,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Storage.Streams;
 
-namespace BluetoothLowEnergySandbox.Blackmagic
+namespace BlackmagicCameraControl.Blackmagic
 {
     public sealed class CameraControlProtocolMessage
     {

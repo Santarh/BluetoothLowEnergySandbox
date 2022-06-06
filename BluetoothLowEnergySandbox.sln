@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothLowEnergySandbox", "BluetoothLowEnergySandbox\BluetoothLowEnergySandbox.csproj", "{198B3D11-C6A5-4AAA-B4EE-A69FDD5012A9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackmagicCameraControl", "BlackmagicCameraControl\BlackmagicCameraControl.csproj", "{01797E0E-F85A-4A95-BD99-C0133C2EDCD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{198B3D11-C6A5-4AAA-B4EE-A69FDD5012A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{198B3D11-C6A5-4AAA-B4EE-A69FDD5012A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{198B3D11-C6A5-4AAA-B4EE-A69FDD5012A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{198B3D11-C6A5-4AAA-B4EE-A69FDD5012A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01797E0E-F85A-4A95-BD99-C0133C2EDCD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01797E0E-F85A-4A95-BD99-C0133C2EDCD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01797E0E-F85A-4A95-BD99-C0133C2EDCD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01797E0E-F85A-4A95-BD99-C0133C2EDCD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
 
-namespace BluetoothLowEnergySandbox
+namespace BlackmagicCameraControl
 {
     public sealed class BleAdvertisementFinder
     {

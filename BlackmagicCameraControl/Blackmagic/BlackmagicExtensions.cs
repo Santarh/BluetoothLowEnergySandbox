@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BluetoothLowEnergySandbox.Blackmagic
+namespace BlackmagicCameraControl.Blackmagic
 {
     public static class BlackmagicExtensions
     {
