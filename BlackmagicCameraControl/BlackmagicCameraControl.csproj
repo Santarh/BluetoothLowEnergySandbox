@@ -11,4 +11,8 @@
       <PackageReference Include="XInput.Wrapper" Version="0.3.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\BlackmagicCameraControlProtocol\BlackmagicCameraControlProtocol.csproj" />
+    </ItemGroup>
+
 </Project>

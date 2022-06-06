@@ -1,6 +1,6 @@
-﻿namespace BlackmagicCameraControl.Blackmagic
+﻿namespace BlackmagicCameraControlProtocol
 {
-    public enum CommandDataType : byte
+    internal enum CommandDataType : byte
     {
         Void = 0,
         Boolean = 0,

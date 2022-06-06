@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace BlackmagicCameraControl.Blackmagic
+﻿namespace BlackmagicCameraControlProtocol
 {
-    public static class BlackmagicExtensions
+    internal static class BlackmagicExtensions
     {
         public static byte[] AsBlackmagicSignedFixedPoint16(this double val)
         {

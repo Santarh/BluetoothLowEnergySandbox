@@ -1,6 +1,6 @@
-﻿namespace BlackmagicCameraControl.Blackmagic
+﻿namespace BlackmagicCameraControlProtocol
 {
-    public readonly struct Command
+    internal readonly struct Command
     {
         /// <summary>
         /// コマンド ID. いまのところ 0 番 ID のコマンドしか存在しないっぽい.

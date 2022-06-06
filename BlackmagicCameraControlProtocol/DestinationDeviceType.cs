@@ -1,4 +1,4 @@
-﻿namespace BlackmagicCameraControl.Blackmagic
+﻿namespace BlackmagicCameraControlProtocol
 {
     public enum DestinationDeviceType : byte
     {

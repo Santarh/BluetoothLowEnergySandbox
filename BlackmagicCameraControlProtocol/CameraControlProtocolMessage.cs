@@ -1,15 +1,12 @@
-﻿using System;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using Windows.Storage.Streams;
+﻿using System.Text;
 
-namespace BlackmagicCameraControl.Blackmagic
+namespace BlackmagicCameraControlProtocol
 {
     public sealed class CameraControlProtocolMessage
     {
         public byte[] Message { get; }
-        
-        public CameraControlProtocolMessage(
+
+        internal CameraControlProtocolMessage(
             DestinationDeviceType destinationDeviceType,
             Command command,
             byte[] data
