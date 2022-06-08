@@ -30,8 +30,8 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
             GattClientCharacteristicConfigurationDescriptorValue.Indicate);
         _incomingCharacteristic.ValueChanged += (characteristic, args) =>
         {
-            var message = new CameraControlProtocolMessage(args.CharacteristicValue.ToArray());
-            Console.WriteLine(message);
+            // var message = new CameraControlProtocolMessage(args.CharacteristicValue.ToArray());
+            // Console.WriteLine(message);
         };
     }
 
@@ -44,7 +44,7 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
     public async ValueTask<bool> SendAsync(CameraControlProtocolMessage message)
     {
         Console.WriteLine($"Sending... {message}");
-        var result = await _outgoingCharacteristic.WriteValueAsync(message.Message.AsBuffer());
+        var result = await _outgoingCharacteristic.WriteValueAsync(MessageSerializer.Serialize(message).AsBuffer());
         if (result != GattCommunicationStatus.Success)
         {
             Console.WriteLine($"Send Error: {result}");

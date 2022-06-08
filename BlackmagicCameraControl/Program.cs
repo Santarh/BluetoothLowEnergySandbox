@@ -35,20 +35,20 @@ internal static class Program
                     var diff = gamepad.LStick_N.X;
                     if (Math.Abs(diff) > 0.01f)
                     {
-                        await bluetoothControl.SendAsync(CameraControlProtocolMessage.ManualLensFocusRelative(
+                        await bluetoothControl.SendAsync(MessageGenerator.ManualLensFocusRelative(
                             DestinationDeviceType.One,
                             diff * 0.02f));
                     }
 
                     if (gamepad.LStick_down)
                     {
-                        await bluetoothControl.SendAsync(CameraControlProtocolMessage.AutoFocus(
+                        await bluetoothControl.SendAsync(MessageGenerator.AutoFocus(
                             DestinationDeviceType.One));
                     }
 
                     if (gamepad.Back_down)
                     {
-                        await bluetoothControl.SendAsync(CameraControlProtocolMessage.StartRecording(
+                        await bluetoothControl.SendAsync(MessageGenerator.StartRecording(
                             DestinationDeviceType.One));
                     }
                 }
