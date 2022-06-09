@@ -26,13 +26,19 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
         _outgoingCharacteristic = outgoingCharacteristic;
         _incomingCharacteristic = incomingCharacteristic;
 
-        _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-            GattClientCharacteristicConfigurationDescriptorValue.Indicate);
         _incomingCharacteristic.ValueChanged += (characteristic, args) =>
         {
-            // var message = new CameraControlProtocolMessage(args.CharacteristicValue.ToArray());
-            // Console.WriteLine(message);
+            if (MessageDeserializer.TryDeserialize(args.CharacteristicValue.ToArray(), out var message))
+            {
+                Console.WriteLine(message);
+                if (message.CommandType == CommandType.SetAbsoluteZoomInMillimeter)
+                {
+                    Console.WriteLine($"{message.CommandType}:{BitConverter.ToInt16(message.CommandData)}");
+                }
+            }
         };
+        _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+            GattClientCharacteristicConfigurationDescriptorValue.Indicate);
     }
 
     public void Dispose()

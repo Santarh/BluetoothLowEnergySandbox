@@ -2,14 +2,34 @@
 
 public static class MessageSerializer
 {
+    public const int MessageHeaderByteCount = 4;
+    public const int CommandHeaderByteCount = 4;
+    public const int Padding = 4;
+    public const int MessageMaximumByteCount = 64;
+    public const int MessageMinimumByteCount = MessageHeaderByteCount + CommandHeaderByteCount;
+
+    public static bool TrySerialize(CameraControlProtocolMessage message, out byte[] data)
+    {
+        try
+        {
+            data = Serialize(message);
+            return true;
+        }
+        catch (Exception)
+        {
+            data = default;
+            return false;
+        }
+    }
+
     public static byte[] Serialize(CameraControlProtocolMessage message)
     {
-        var commandByteCount = message.CommandLength;
-        var messageByteCount = 4 + commandByteCount;
+        var commandByteCount = message.CommandByteCount;
+        var messageByteCount = MessageHeaderByteCount + commandByteCount;
         // calculate data length by padding with 4byte boundary
-        var dataByteCount = (messageByteCount / 4 + (messageByteCount % 4 == 0 ? 0 : 1)) * 4;
+        var dataByteCount = (messageByteCount / Padding + (messageByteCount % Padding == 0 ? 0 : 1)) * Padding;
 
-        if (dataByteCount > 64) // spec
+        if (dataByteCount > MessageMaximumByteCount)
         {
             throw new ArgumentException("Too long message.");
         }
@@ -29,10 +49,18 @@ public static class MessageSerializer
         data[7] = (byte)message.OperationType;
 
         // Command Data
-        var commandDataByteCount = commandByteCount - 4;
-        for (var idx = 0; idx < commandDataByteCount; ++idx)
+        var commandDataByteCount = commandByteCount - CommandHeaderByteCount;
+        if (commandDataByteCount > 0)
         {
-            data[8 + idx] = message.CommandData[idx];
+            if (message.CommandData.Length != commandDataByteCount)
+            {
+                throw new ArgumentException();
+            }
+
+            for (var idx = 0; idx < commandDataByteCount; ++idx)
+            {
+                data[MessageMinimumByteCount + idx] = message.CommandData[idx];
+            }
         }
 
         return data;

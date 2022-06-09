@@ -1,4 +1,6 @@
-﻿namespace BlackmagicCameraControlProtocol;
+﻿using System.Text;
+
+namespace BlackmagicCameraControlProtocol;
 
 public readonly struct CameraControlProtocolMessage
 {
@@ -12,7 +14,7 @@ public readonly struct CameraControlProtocolMessage
     /// コマンドチャンクの長さ
     /// 末尾のパディングは含めない
     /// </summary>
-    public byte CommandLength { get; }
+    public byte CommandByteCount { get; }
 
     /// <summary>
     /// コマンドセットの ID
@@ -41,14 +43,29 @@ public readonly struct CameraControlProtocolMessage
     /// </summary>
     public byte[] CommandData { get; }
 
-    public CameraControlProtocolMessage(DestinationDeviceType destinationDevice, byte commandLength, byte commandId, CommandType commandType, CommandDataType dataType, CommandOperationType operationType, byte[] commandData)
+    public CameraControlProtocolMessage(DestinationDeviceType destinationDevice, byte commandByteCount, byte commandId, CommandType commandType, CommandDataType dataType, CommandOperationType operationType, byte[] commandData)
     {
         DestinationDevice = destinationDevice;
-        CommandLength = commandLength;
+        CommandByteCount = commandByteCount;
         CommandId = commandId;
         CommandType = commandType;
         DataType = dataType;
         OperationType = operationType;
         CommandData = commandData;
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine(nameof(CameraControlProtocolMessage));
+        sb.AppendLine($"    DestinationDevice: {DestinationDevice}");
+        sb.AppendLine($"    CommandByteCount : {CommandByteCount}");
+        sb.AppendLine($"    CommandId        : {CommandId}");
+        sb.AppendLine($"    CommandType      : {CommandType}");
+        sb.AppendLine($"    DataType         : {DataType}");
+        sb.AppendLine($"    OperationType    : {OperationType}");
+        sb.AppendLine($"    CommandData      : {string.Join(" ", CommandData?.Select(x => $"{x:X2}") ?? Array.Empty<string>())}");
+
+        return sb.ToString();
     }
 }
