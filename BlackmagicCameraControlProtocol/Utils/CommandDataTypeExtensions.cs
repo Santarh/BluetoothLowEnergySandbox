@@ -6,7 +6,7 @@ internal static class CommandDataTypeExtensions
     {
         return type switch
         {
-            CommandDataType.Void => 0,
+            CommandDataType.VoidOrBoolean => 0,
             CommandDataType.SInt8 => 1,
             CommandDataType.SInt16 => 2,
             CommandDataType.SInt32 => 4,

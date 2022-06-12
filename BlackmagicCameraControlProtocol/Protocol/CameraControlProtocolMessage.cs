@@ -2,6 +2,8 @@
 
 public readonly struct CameraControlProtocolMessage
 {
+    public const int CommandHeaderByteCount = 4;
+
     /// <summary>
     /// 目的とするデバイス ID
     /// ブロードキャストの場合は 255
@@ -50,6 +52,11 @@ public readonly struct CameraControlProtocolMessage
         DataType = dataType;
         OperationType = operationType;
         CommandData = commandData;
+
+        if (CommandByteCount != CommandData.Length + CommandHeaderByteCount)
+        {
+            throw new ArgumentException();
+        }
     }
 
     public override string ToString()
@@ -70,9 +77,10 @@ public readonly struct CameraControlProtocolMessage
         // return sb.ToString();
     }
 
-    public void Deconstruct(out CommandType commandType, out CommandDataType dataType)
+    public void Deconstruct(out CommandType commandType, out CommandDataType dataType, out int commandDataLength)
     {
         commandType = CommandType;
         dataType = DataType;
+        commandDataLength = CommandData.Length;
     }
 }

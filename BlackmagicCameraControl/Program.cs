@@ -24,14 +24,22 @@ internal static class Program
             // Read
             bluetoothControl.OnReceived += (message) =>
             {
-                var output = message switch
+                var sb = new StringBuilder($"[{message.CommandType.ToCategoryByte()}.{message.CommandType.ToParameterByte()}]{message.CommandType}:");
+                var messageString = message switch
                 {
-                    ((CommandType) 2304, _) => $"{message.CommandType}:{string.Join(" ", Enumerable.Range(0, (message.CommandByteCount - 4)/2).Select(x => BitConverter.ToInt16(message.CommandData, x * 2)))}",
-                    (_, CommandDataType.Utf8String) => $"{message.CommandType}:[string]{Encoding.UTF8.GetString(message.CommandData)}",
+                    (_, CommandDataType.Utf8String, _) => $"(String){Encoding.UTF8.GetString(message.CommandData)}",
+                    (_, CommandDataType.VoidOrBoolean, 0) => $"(Void)",
+                    (_, CommandDataType.VoidOrBoolean, _) => $"(Boolean){Enumerable.Range(0, message.CommandData.Length).Select(x => (message.CommandData[x] != 0).ToString()).JoinString(" ")}",
+                    (_, CommandDataType.SInt8, _) => $"(SInt8){Enumerable.Range(0, message.CommandData.Length).Select(x => message.CommandData[x].ToString()).JoinString(" ")}",
+                    (_, CommandDataType.SInt16, _) => $"(SInt16){Enumerable.Range(0, message.CommandData.Length / 2).Select(x => BitConverter.ToInt16(message.CommandData, x * 2).ToString()).JoinString(" ")}",
+                    (_, CommandDataType.SInt32, _) => $"(SInt32){Enumerable.Range(0, message.CommandData.Length / 4).Select(x => BitConverter.ToInt16(message.CommandData, x * 4).ToString()).JoinString(" ")}",
+                    (_, CommandDataType.SInt64, _) => $"(SInt64){Enumerable.Range(0, message.CommandData.Length / 8).Select(x => BitConverter.ToInt16(message.CommandData, x * 8).ToString()).JoinString(" ")}",
+                    (_, CommandDataType.SFixedPoint16, _) => $"(SFixedPoint16){Enumerable.Range(0, message.CommandData.Length / 2).Select(x => message.CommandData.FromBlackmagicSignedFixedPoint16(x * 2).ToString()).JoinString(" ")}",
                     _ => message.ToString(),
                 };
+                sb.Append(messageString);
 
-                Console.WriteLine(output);
+                Console.WriteLine(sb.ToString());
             };
 
             // Write

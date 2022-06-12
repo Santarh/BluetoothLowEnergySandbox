@@ -57,7 +57,7 @@ public sealed class CommandSpecification
         new Dictionary<CommandType, CommandSpecification>()
         {
             { CommandType.Focus , new CommandSpecification(0, CommandType.Focus, CommandDataType.SFixedPoint16, 1, CommandOperationType.OffsetValue)},
-            { CommandType.InstantaneousAutoFocus, new CommandSpecification(0, CommandType.InstantaneousAutoFocus, CommandDataType.Void, 0, CommandOperationType.AssignValue)},
+            { CommandType.InstantaneousAutoFocus, new CommandSpecification(0, CommandType.InstantaneousAutoFocus, CommandDataType.VoidOrBoolean, 0, CommandOperationType.AssignValue)},
             { CommandType.SetAbsoluteZoomInMillimeter, new CommandSpecification(0, CommandType.SetAbsoluteZoomInMillimeter, CommandDataType.SInt16, 1, CommandOperationType.AssignValue)},
             { CommandType.TransportMode, new CommandSpecification(0, CommandType.TransportMode, CommandDataType.SInt8, 5, CommandOperationType.AssignValue)},
         };

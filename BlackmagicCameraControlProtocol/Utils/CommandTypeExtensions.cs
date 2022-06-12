@@ -1,6 +1,6 @@
 ﻿namespace BlackmagicCameraControlProtocol;
 
-internal static class CommandTypeExtensions
+public static class CommandTypeExtensions
 {
     public static byte ToCategoryByte(this CommandType type)
     {

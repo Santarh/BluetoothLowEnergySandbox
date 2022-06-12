@@ -2,8 +2,7 @@
 
 public enum CommandDataType : byte
 {
-    Void = 0,
-    Boolean = 0,
+    VoidOrBoolean = 0,
     SInt8 = 1,
     SInt16 = 2,
     SInt32 = 3,
