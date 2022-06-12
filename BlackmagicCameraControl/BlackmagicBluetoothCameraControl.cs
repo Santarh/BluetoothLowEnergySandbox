@@ -1,11 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
+﻿using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using BlackmagicCameraControlProtocol;
 
 namespace BlackmagicCameraControl;
+
+public delegate void ControlMessageEventHandler(CameraControlProtocolMessage message);
 
 public sealed class BlackmagicBluetoothCameraControl : IDisposable
 {
@@ -18,6 +18,8 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
     private readonly GattCharacteristic _outgoingCharacteristic;
     private readonly GattCharacteristic _incomingCharacteristic;
 
+    public event ControlMessageEventHandler OnReceived;
+
     private BlackmagicBluetoothCameraControl(BluetoothLEDevice device, GattDeviceService service,
         GattCharacteristic outgoingCharacteristic, GattCharacteristic incomingCharacteristic)
     {
@@ -26,23 +28,16 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
         _outgoingCharacteristic = outgoingCharacteristic;
         _incomingCharacteristic = incomingCharacteristic;
 
-        _incomingCharacteristic.ValueChanged += (characteristic, args) =>
-        {
-            if (MessageDeserializer.TryDeserialize(args.CharacteristicValue.ToArray(), out var message))
-            {
-                Console.WriteLine(message);
-                if (message.CommandType == CommandType.SetAbsoluteZoomInMillimeter)
-                {
-                    Console.WriteLine($"{message.CommandType}:{BitConverter.ToInt16(message.CommandData)}");
-                }
-            }
-        };
+        _incomingCharacteristic.ValueChanged += OnGattValueChanged;
         _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
             GattClientCharacteristicConfigurationDescriptorValue.Indicate);
     }
 
     public void Dispose()
     {
+        _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
+            GattClientCharacteristicConfigurationDescriptorValue.None);
+        _incomingCharacteristic.ValueChanged -= OnGattValueChanged;
         _service?.Dispose();
         _device?.Dispose();
     }
@@ -50,12 +45,22 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
     public async ValueTask<bool> SendAsync(CameraControlProtocolMessage message)
     {
         Console.WriteLine($"Sending... {message}");
-        var result = await _outgoingCharacteristic.WriteValueAsync(MessageSerializer.Serialize(message).AsBuffer());
+        var result = await _outgoingCharacteristic.WriteValueAsync(
+            MessageSerializer.Serialize(message).AsBuffer(),
+            GattWriteOption.WriteWithResponse);
         if (result != GattCommunicationStatus.Success)
         {
             Console.WriteLine($"Send Error: {result}");
         }
         return result == GattCommunicationStatus.Success;
+    }
+
+    private void OnGattValueChanged(GattCharacteristic characteristic, GattValueChangedEventArgs args)
+    {
+        if (MessageDeserializer.TryDeserialize(args.CharacteristicValue.ToArray(), out var message))
+        {
+            OnReceived?.Invoke(message);
+        }
     }
 
     public static async ValueTask<BlackmagicBluetoothCameraControl> CreateAsync(ulong bluetoothAddress, CancellationToken token)

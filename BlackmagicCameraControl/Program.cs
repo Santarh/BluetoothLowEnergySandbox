@@ -20,6 +20,17 @@ internal static class Program
             using var bluetoothControl = await BlackmagicBluetoothCameraControl.CreateAsync(address, token);
             Console.WriteLine($"CONNECTED to {address}");
 
+            // Read
+            bluetoothControl.OnReceived += message =>
+            {
+                Console.WriteLine(message);
+                if (message.CommandType == CommandType.SetAbsoluteZoomInMillimeter)
+                {
+                    Console.WriteLine($"{message.CommandType}:{BitConverter.ToInt16(message.CommandData)}");
+                }
+            };
+
+            // Write
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1.0 / 10.0));
             var gamepad = XInput.Wrapper.X.Gamepad_1;
             while (true)

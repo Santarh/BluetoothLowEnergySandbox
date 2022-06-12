@@ -56,16 +56,19 @@ public readonly struct CameraControlProtocolMessage
 
     public override string ToString()
     {
-        var sb = new StringBuilder();
-        sb.AppendLine(nameof(CameraControlProtocolMessage));
-        sb.AppendLine($"    DestinationDevice: {DestinationDevice}");
-        sb.AppendLine($"    CommandByteCount : {CommandByteCount}");
-        sb.AppendLine($"    CommandId        : {CommandId}");
-        sb.AppendLine($"    CommandType      : {CommandType}");
-        sb.AppendLine($"    DataType         : {DataType}");
-        sb.AppendLine($"    OperationType    : {OperationType}");
-        sb.AppendLine($"    CommandData      : {string.Join(" ", CommandData?.Select(x => $"{x:X2}") ?? Array.Empty<string>())}");
+        var commandData = string.Join(" ", CommandData?.Select(x => $"{x:X2}") ?? Array.Empty<string>());
+        return $"{DestinationDevice}:{CommandByteCount}:{CommandId}:{CommandType}:{DataType}:{OperationType}:{commandData}";
 
-        return sb.ToString();
+        // var sb = new StringBuilder();
+        // sb.AppendLine(nameof(CameraControlProtocolMessage));
+        // sb.AppendLine($"    DestinationDevice: {DestinationDevice}");
+        // sb.AppendLine($"    CommandByteCount : {CommandByteCount}");
+        // sb.AppendLine($"    CommandId        : {CommandId}");
+        // sb.AppendLine($"    CommandType      : {CommandType}");
+        // sb.AppendLine($"    DataType         : {DataType}");
+        // sb.AppendLine($"    OperationType    : {OperationType}");
+        // sb.AppendLine($"    CommandData      : {string.Join(" ", CommandData?.Select(x => $"{x:X2}") ?? Array.Empty<string>())}");
+        //
+        // return sb.ToString();
     }
 }
