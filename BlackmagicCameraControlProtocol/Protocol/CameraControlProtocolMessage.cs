@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace BlackmagicCameraControlProtocol;
+﻿namespace BlackmagicCameraControlProtocol;
 
 public readonly struct CameraControlProtocolMessage
 {
@@ -70,5 +68,11 @@ public readonly struct CameraControlProtocolMessage
         // sb.AppendLine($"    CommandData      : {string.Join(" ", CommandData?.Select(x => $"{x:X2}") ?? Array.Empty<string>())}");
         //
         // return sb.ToString();
+    }
+
+    public void Deconstruct(out CommandType commandType, out CommandDataType dataType)
+    {
+        commandType = CommandType;
+        dataType = DataType;
     }
 }

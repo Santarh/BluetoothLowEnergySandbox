@@ -1,4 +1,5 @@
-﻿using BlackmagicCameraControlProtocol;
+﻿using System.Text;
+using BlackmagicCameraControlProtocol;
 
 namespace BlackmagicCameraControl;
 
@@ -21,13 +22,16 @@ internal static class Program
             Console.WriteLine($"CONNECTED to {address}");
 
             // Read
-            bluetoothControl.OnReceived += message =>
+            bluetoothControl.OnReceived += (message) =>
             {
-                Console.WriteLine(message);
-                if (message.CommandType == CommandType.SetAbsoluteZoomInMillimeter)
+                var output = message switch
                 {
-                    Console.WriteLine($"{message.CommandType}:{BitConverter.ToInt16(message.CommandData)}");
-                }
+                    ((CommandType) 2304, _) => $"{message.CommandType}:{string.Join(" ", Enumerable.Range(0, (message.CommandByteCount - 4)/2).Select(x => BitConverter.ToInt16(message.CommandData, x * 2)))}",
+                    (_, CommandDataType.Utf8String) => $"{message.CommandType}:[string]{Encoding.UTF8.GetString(message.CommandData)}",
+                    _ => message.ToString(),
+                };
+
+                Console.WriteLine(output);
             };
 
             // Write
