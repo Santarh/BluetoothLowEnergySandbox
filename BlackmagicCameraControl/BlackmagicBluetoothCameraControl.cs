@@ -7,7 +7,7 @@ namespace BlackmagicCameraControl;
 
 public delegate void ControlMessageEventHandler(CameraControlProtocolMessage message);
 
-public sealed class BlackmagicBluetoothCameraControl : IDisposable
+public sealed class BlackmagicBluetoothCameraControl : IAsyncDisposable
 {
     public static readonly Guid BlackmagicCameraServiceGuid = new Guid("291d567a-6d75-11e6-8b77-86f30ca893d3");
     public static readonly Guid OutgoingCameraControlCharacteristicGuid = new Guid("5DD3465F-1AEE-4299-8493-D2ECA2F8E1BB");
@@ -27,17 +27,13 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
         _service = service;
         _outgoingCharacteristic = outgoingCharacteristic;
         _incomingCharacteristic = incomingCharacteristic;
-
-        _incomingCharacteristic.ValueChanged += OnGattValueChanged;
-        _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-            GattClientCharacteristicConfigurationDescriptorValue.Indicate);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(
-            GattClientCharacteristicConfigurationDescriptorValue.None);
         _incomingCharacteristic.ValueChanged -= OnGattValueChanged;
+        await _incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+
         _service?.Dispose();
         _device?.Dispose();
     }
@@ -70,7 +66,12 @@ public sealed class BlackmagicBluetoothCameraControl : IDisposable
         var outgoingCharacteristic = await GetFirstCharacteristicAsync(service, OutgoingCameraControlCharacteristicGuid);
         var incomingCharacteristic = await GetFirstCharacteristicAsync(service, IncomingCameraControlCharacteristicGuid);
 
-        return new BlackmagicBluetoothCameraControl(device, service, outgoingCharacteristic, incomingCharacteristic);
+        var self = new BlackmagicBluetoothCameraControl(device, service, outgoingCharacteristic, incomingCharacteristic);
+
+        incomingCharacteristic.ValueChanged += self.OnGattValueChanged;
+        await incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Indicate);
+
+        return self;
     }
 
     private static async ValueTask<GattDeviceService> GetFirstServiceAsync(BluetoothLEDevice device, Guid guid)

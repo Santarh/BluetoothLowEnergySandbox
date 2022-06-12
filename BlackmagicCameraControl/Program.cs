@@ -18,7 +18,7 @@ internal static class Program
         try
         {
             var address = await new BleAdvertisementFinder(BlackmagicBluetoothCameraControl.BlackmagicCameraServiceGuid).GetBluetoothAddressAsync(token);
-            using var bluetoothControl = await BlackmagicBluetoothCameraControl.CreateAsync(address, token);
+            await using var bluetoothControl = await BlackmagicBluetoothCameraControl.CreateAsync(address, token);
             Console.WriteLine($"CONNECTED to {address}");
 
             // Read
@@ -89,7 +89,7 @@ internal static class Program
         }
         catch (OperationCanceledException)
         {
-            Console.WriteLine("CANCELED!");
+            Console.WriteLine("STOPPING...");
         }
         catch (Exception e)
         {
