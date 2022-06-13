@@ -20,6 +20,27 @@ public sealed class BlackmagicBluetoothCameraControl : IAsyncDisposable
 
     public event ControlMessageEventHandler OnReceived;
 
+    public static async ValueTask<BlackmagicBluetoothCameraControl> CreateAsync(ulong bluetoothAddress, CancellationToken token)
+    {
+        var device = await BluetoothLEDevice.FromBluetoothAddressAsync(bluetoothAddress);
+        var service = await GetFirstServiceAsync(device, BlackmagicCameraServiceGuid);
+        var outgoingCharacteristic = await GetFirstCharacteristicAsync(service, OutgoingCameraControlCharacteristicGuid);
+        var incomingCharacteristic = await GetFirstCharacteristicAsync(service, IncomingCameraControlCharacteristicGuid);
+
+        var self = new BlackmagicBluetoothCameraControl(device, service, outgoingCharacteristic, incomingCharacteristic);
+
+        incomingCharacteristic.ValueChanged += self.OnGattValueChanged;
+        // NOTE: たまに Descriptor 書き込みで COMException が出るので少し待つ（効果不明）
+        await Task.Delay(TimeSpan.FromSeconds(0.2), token);
+        var result = await incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Indicate);
+        if (result != GattCommunicationStatus.Success)
+        {
+            throw new Exception($"Can't write indicate status. {result}");
+        }
+
+        return self;
+    }
+
     private BlackmagicBluetoothCameraControl(BluetoothLEDevice device, GattDeviceService service,
         GattCharacteristic outgoingCharacteristic, GattCharacteristic incomingCharacteristic)
     {
@@ -57,21 +78,6 @@ public sealed class BlackmagicBluetoothCameraControl : IAsyncDisposable
         {
             OnReceived?.Invoke(message);
         }
-    }
-
-    public static async ValueTask<BlackmagicBluetoothCameraControl> CreateAsync(ulong bluetoothAddress, CancellationToken token)
-    {
-        var device = await BluetoothLEDevice.FromBluetoothAddressAsync(bluetoothAddress);
-        var service = await GetFirstServiceAsync(device, BlackmagicCameraServiceGuid);
-        var outgoingCharacteristic = await GetFirstCharacteristicAsync(service, OutgoingCameraControlCharacteristicGuid);
-        var incomingCharacteristic = await GetFirstCharacteristicAsync(service, IncomingCameraControlCharacteristicGuid);
-
-        var self = new BlackmagicBluetoothCameraControl(device, service, outgoingCharacteristic, incomingCharacteristic);
-
-        incomingCharacteristic.ValueChanged += self.OnGattValueChanged;
-        await incomingCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Indicate);
-
-        return self;
     }
 
     private static async ValueTask<GattDeviceService> GetFirstServiceAsync(BluetoothLEDevice device, Guid guid)
